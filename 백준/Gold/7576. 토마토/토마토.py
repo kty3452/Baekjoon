@@ -26,19 +26,17 @@ for i in range(1, N + 1):
 queue = deque(start_is_one) 
 for i, j in start_is_one:
     visited[i][j] = 1
-for i, j in start_is_one:
-    visited[i][j] = 1
-    while queue:
-        cy, cx = queue.popleft()
-        for k in range(4):
-            ny, nx = cy + dy[k], cx + dx[k]
-            if visited[ny][nx] == 0 and grape[ny][nx] == 0:
-                visited[ny][nx] = visited[cy][cx] + 1
-                # -1을 해주는 이유는 visited의 첫번째 값이 1부터 시작하기 때문
-                # 그러나 토마토는 0부터 시작
-                max_count = max(max_count, visited[ny][nx] - 1)
-                grape[ny][nx] = 1
-                queue.append((ny, nx))
+while queue:
+    cy, cx = queue.popleft()
+    for k in range(4):
+        ny, nx = cy + dy[k], cx + dx[k]
+        if visited[ny][nx] == 0 and grape[ny][nx] == 0:
+            visited[ny][nx] = visited[cy][cx] + 1
+            # -1을 해주는 이유는 visited의 첫번째 값이 1부터 시작하기 때문
+            # 그러나 토마토는 0부터 시작
+            max_count = max(max_count, visited[ny][nx] - 1)
+            grape[ny][nx] = 1
+            queue.append((ny, nx))
 
     
 for i in range(1, N + 1):
@@ -46,4 +44,3 @@ for i in range(1, N + 1):
         max_count = -1
         break
 print(max_count)
-                
