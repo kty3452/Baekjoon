@@ -4,7 +4,6 @@ from collections import deque
 import sys
 
 M, N = map(int, sys.stdin.readline().strip().split())
-visited = [[0] * (M + 2) for _ in range(N + 2)]
 grape = [[-1] * (M + 2) for _ in range(N + 2)]
 dy = [0, 0, 1, -1]
 dx = [1, -1, 0, 0]
@@ -23,19 +22,16 @@ for i in range(1, N + 1):
     start_is_one.extend((i, j) for j, val in enumerate(grape[i][1:M+1], start=1) if val == 1)
 
 # 리스트를 넣으면 한번에 됨
-queue = deque(start_is_one) 
-for i, j in start_is_one:
-    visited[i][j] = 1
+queue = deque(start_is_one)
 while queue:
     cy, cx = queue.popleft()
     for k in range(4):
         ny, nx = cy + dy[k], cx + dx[k]
-        if visited[ny][nx] == 0 and grape[ny][nx] == 0:
-            visited[ny][nx] = visited[cy][cx] + 1
+        if grape[ny][nx] == 0:
             # -1을 해주는 이유는 visited의 첫번째 값이 1부터 시작하기 때문
             # 그러나 토마토는 0부터 시작
-            max_count = max(max_count, visited[ny][nx] - 1)
-            grape[ny][nx] = 1
+            grape[ny][nx] = grape[cy][cx] + 1
+            max_count = max(max_count, grape[ny][nx] - 1)
             queue.append((ny, nx))
 
     
