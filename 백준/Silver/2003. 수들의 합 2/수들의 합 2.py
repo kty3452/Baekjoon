@@ -13,19 +13,13 @@ left = 0
 right = 0
 hap = arr[0]
 
-while left < N:
+while right < N:
     if hap == M:
         result += 1
-        if right + 1 >= N:
-            break
+    if hap <= M:
         right += 1
-        hap = hap + arr[right] - arr[left]
-        left += 1
-    elif hap < M:
-        if right + 1 >= N:
-            break
-        right += 1
-        hap += arr[right]
+        if right < N:
+            hap += arr[right]
     else:
         hap -= arr[left]
         left += 1
