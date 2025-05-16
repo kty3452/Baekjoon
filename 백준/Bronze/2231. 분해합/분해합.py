@@ -8,7 +8,7 @@ def input():
 num = int(input())
 result = 0
 
-for i in range(1, num + 1):
+for i in range(num - 9 * len(str(num)), num + 1):
     cur_num = i
     temp = cur_num
     while cur_num > 0:
