@@ -1,67 +1,33 @@
-# 외판원 순회2
-
+# 외판원 순회2 (리팩토링 버전)
 import sys
 
-min_cost = 10000001
+min_cost = float('inf')
 
 def user_input():
     return sys.stdin.readline().strip()
 
-# def backtrack(N, W, used, only_use, arr, min_cost, start):
-#     if len(arr) == N - 1:
-#         if W[only_use][start]:
-#             if min_cost[0] > sum(arr) + W[only_use][start]:
-#                 min_cost[0] = sum(arr) + W[only_use][start]
-#         return
-#     for i in range(N):
-#         if len(arr) == 0:
-#             used[start] = False
-#             start = i
-#             used[start] = True
-#             only_use = start
-#         if i == only_use:
-#             for j in range(N):
-#                 if used[j] or W[i][j] == 0:
-#                     continue
-#                 used[j] = True
-#                 arr.append(W[i][j])
-#                 backtrack(N, W, used, j, arr, min_cost, start)
-#                 arr.pop()
-#                 used[j] = False
+def backtrack(N, W, start, current, used, path_sum, depth):
+    global min_cost
 
-def backtrack(N, W, start, prev, used, arr):
-    if len(arr) == N - 1:
-        global min_cost
-        if W[prev][start]:
-            if min_cost > sum(arr) + W[prev][start]:
-                min_cost = sum(arr) + W[prev][start]
+    # 모든 도시 방문 완료 후 시작 도시로 복귀 가능한 경우
+    if depth == N - 1:
+        if W[current][start]:
+            total_cost = path_sum + W[current][start]
+            min_cost = min(min_cost, total_cost)
         return
-    for next in range(N):
-        if used[next] or W[prev][next] == 0:
-            continue
-        used[next] = True
-        arr.append(W[prev][next])
-        backtrack(N, W, start, next, used, arr)
-        arr.pop()
-        used[next] = False
-        
+
+    for next_city in range(N):
+        if not used[next_city] and W[current][next_city] != 0:
+            used[next_city] = True
+            backtrack(N, W, start, next_city, used, path_sum + W[current][next_city], depth + 1)
+            used[next_city] = False
+
 N = int(user_input())
 W = [list(map(int, user_input().split())) for _ in range(N)]
-# min_cost = [10000001]
-
-# backtrack(N, W, [False] * N, -1, [], min_cost, -1)
-# if min_cost[0] > 10000001:
-#     min_cost[0] = 0
-# print(min_cost[0])
-
 
 for start in range(N):
     used = [False] * N
     used[start] = True
-    arr = []
-    prev = start
-    backtrack(N, W, start, prev, used, arr)
+    backtrack(N, W, start, start, used, 0, 0)
 
-if min_cost > 10000001:
-    min_cost = 0
-print(min_cost)
+print(0 if min_cost == float('inf') else min_cost)
