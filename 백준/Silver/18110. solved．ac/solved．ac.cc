@@ -14,8 +14,8 @@ int main(){
     }
     sort(levels + 1, levels + n + 1);
     double d = (double)n * 0.15;
-    if(d - (double)(int)d >= 0.5) d += (1.0 - (d - (double)(int)d));
-    else d -= (d - (double)(int)d);
+    if(d - (int)d >= 0.5) d = (int)d + 1;
+    else d = (int)d;
 
     double avg = 0;
 
@@ -25,8 +25,8 @@ int main(){
     if(avg) avg /= ((double)n - (2 * d));
 
     
-    if(avg - (double)(int)avg >= 0.5) avg += (1.0 - (avg - (double)(int)avg));
-    else avg -= (avg - (double)(int)avg);
+    if(avg - (int)avg >= 0.5) avg = (int)avg + 1;
+    else avg = (int)avg;
 
     cout << avg;
 
