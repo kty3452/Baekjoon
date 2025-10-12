@@ -16,19 +16,24 @@ int main(){
     cin >> IOI;
 
     int space = n * 2;
-    int result = 0;
-
-    for(int i = 0;i < m - space;i++){
-        bool check_IOI = true;
-        if(IOI[i] == 'I'){
-            for(int j = i + 1;j <= i + space;j++){
-                if(IOI[j] == IOI[j - 1]) {
-                    check_IOI = false;
-                    break;
-                }
-            }
-            if(check_IOI) result++;
+    int cnt = 0;
+    bool check_IOI = true;
+    static int IOI_N[1000001] = {0, };
+    for(int i = 0;i < m - 1;i++){
+        if(IOI[i] == 'I') check_IOI = true;
+        if(check_IOI) cnt++;
+        if(IOI[i] == IOI[i + 1]) {
+            check_IOI = false;
+            if(cnt & 1 == 1) IOI_N[cnt/2]++;
+            else IOI_N[(cnt-1)/2]++;
+            cnt = 0;
         }
+    }
+    IOI_N[cnt/2]++;
+    
+    int result = 0;
+    for(int i = n;i <= 1000000;i++){
+        result += ((i - n + 1) * IOI_N[i]);
     }
     cout << result;
     return 0;
