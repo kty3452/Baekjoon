@@ -37,7 +37,7 @@ int main(){
         for(auto[movey, movex] : move){
             int ny = cy + movey;
             int nx = cx + movex;
-            if(ny < 0 || ny > n || nx < 0 || nx > m) continue;
+            if(ny < 1 || ny > n || nx < 1 || nx > m) continue;
             if(graph[ny][nx] == 1 && !visited[ny][nx]){
                 visited[ny][nx] = visited[cy][cx] + 1;
                 Q.push({ny, nx});
