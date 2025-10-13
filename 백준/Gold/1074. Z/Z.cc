@@ -1,48 +1,26 @@
-// Z
 #include <iostream>
-
 using namespace std;
 
-int main(){
+int z(int n, int r, int c) {
+    if (n == 0) return 0;  // 1x1이면 방문 순서 = 0
+    int half = 1 << (n - 1);   // 블록 한 변의 절반
+    int area = half * half;    // 블록 하나의 면적 (n-1 단계 블록 크기)
+
+    // 4분면에 따라 offset 다름
+    if (r < half && c < half)            // 1사분면 (왼위)
+        return z(n - 1, r, c);
+    if (r < half && c >= half)           // 2사분면 (오위)
+        return area + z(n - 1, r, c - half);
+    if (r >= half && c < half)           // 3사분면 (왼아래)
+        return 2 * area + z(n - 1, r - half, c);
+    return 3 * area + z(n - 1, r - half, c - half);  // 4사분면 (오아래)
+}
+
+int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
     int n, r, c;
     cin >> n >> r >> c;
-
-    int row[32768] = {0, };
-    int col[32768] = {0, };
-    col[1] = 1;
-    row[1] = 2;
-    int next_edge = 2;
-    int edge = 1;
-    int max_edge = 1;
-    for(int i = 0;i < n;i++){
-        max_edge *= 2;
-    }
-    for(int i = 2;i < max_edge;i++){
-        if(i == next_edge){
-            col[i] = next_edge * next_edge;
-            edge = next_edge;
-            next_edge *= 2;
-            continue;
-        }
-        else col[i] = col[edge] + col[i % edge]; 
-    }
-    next_edge = 2;
-    edge = 1;
-    for(int i = 2;i < max_edge;i++){
-        if(i == next_edge){
-            row[i] = next_edge * next_edge * 2;
-            edge = next_edge;
-            next_edge *= 2;
-        }
-        else row[i] = row[edge] + row[i % edge]; 
-    }
-
-    int result = row[r] + col[c];
-
-    cout << result;
-
-    return 0;
+    cout << z(n, r, c);
 }
