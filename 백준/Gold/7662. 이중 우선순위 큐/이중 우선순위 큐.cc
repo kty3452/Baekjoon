@@ -1,123 +1,82 @@
-#include <iostream>
-#include <vector>
-#include <map>
-#include <algorithm>
-
+#include <bits/stdc++.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 using namespace std;
+// 제 코드가 아니며, 제가 해당 문제를 클리어한 후 실행 속도가 가장 빠른 코드 위주로 퍼와 추가하고 있습니다.
+// 백준에서 참조할 수 있는 코드 중 가장 빠릅니다.
+template<typename T> class MinMaxHeap { // Symmetric Min-Max Heap
+public:
+	MinMaxHeap() : v(2) { v.reserve(1'000'100); }
+	~MinMaxHeap() {}
 
-void min_heapify(string s, vector<long long> &V, int i){
-    if(s == "up"){
-        if(i == 1) return;
-        int p = i/2;
-        if(V[p] > V[i]){
-            swap(V[p], V[i]);
-            min_heapify("up", V, p);
-        }
-    }
-    else{
-        int l = i*2;
-        int r = i*2+1;
-        int smallest = i;
+	void Push(const T& val) {
+		size_t cur = v.size(); v.push_back(val);
+		while (cur > 3) {
+			if (cur & 1 && v[cur - 1] > v[cur]) swap(v[cur - 1], v[cur]), cur--;
+			if (v[cur] < v[cur / 4 * 2]) swap(v[cur], v[cur / 4 * 2]), cur = cur / 4 * 2;
+			else if (v[cur] > v[cur / 4 * 2 + 1]) swap(v[cur], v[cur / 4 * 2 + 1]), cur = cur / 4 * 2 + 1;
+			else break;
+		}
+		if (cur == 3 && v[2] > v[3]) swap(v[2], v[3]);
+	}
 
-        if(l < V.size() && V[smallest] > V[l]) smallest = l;
-        if(r < V.size() && V[smallest] > V[r]) smallest = r;
-        if(smallest != i){
-            swap(V[i], V[smallest]);
-            min_heapify("down", V, smallest);
-        }
-    }
-}
-void max_heapify(string s, vector<long long> &V, int i){
-    if(s == "up"){
-        if(i == 1) return;
-        int p = i/2;
-        if(V[p] < V[i]){
-            swap(V[p], V[i]);
-            max_heapify("up", V, p);
-        }
-    }
-    else{
-        int l = i*2;
-        int r = i*2+1;
-        int largest = i;
+	void PopMin() {
+		assert(!Empty());
+		size_t cur = 2, nxt; swap(v[cur], v.back()), v.pop_back();
+		while (cur < v.size()) {
+			if (cur + 1 < v.size() && v[cur] > v[cur + 1]) swap(v[cur], v[cur + 1]); nxt = 2 * cur;
+			if (nxt >= v.size()) break;
+			if (2 * (cur + 1) < v.size() && v[nxt] > v[2 * (cur + 1)]) nxt = 2 * (cur + 1);
+			if (v[cur] > v[nxt]) swap(v[cur], v[nxt]), cur = nxt;
+			else break;
+		}
+	}
 
-        if(l < V.size() && V[largest] < V[l]) largest = l;
-        if(r < V.size() && V[largest] < V[r]) largest = r;
-        if(largest != i){
-            swap(V[i], V[largest]);
-            max_heapify("down", V, largest);
-        }
-    }
-}
+	void PopMax() {
+		assert(!Empty());
+		if (v.size() == 3) { v.pop_back(); return; }
+		size_t cur = 3, nxt; swap(v[cur], v.back()), v.pop_back();
+		while (cur < v.size()) {
+			if (v[cur - 1] > v[cur]) swap(v[cur - 1], v[cur]); nxt = 2 * (cur - 1) + 1;
+			if (nxt >= v.size()) break;
+			if (2 * cur + 1 < v.size() && v[nxt] < v[2 * cur + 1]) nxt = 2 * cur + 1;
+			if (v[cur] < v[nxt]) swap(v[cur], v[nxt]), cur = nxt;
+			else break;
+		}
+	}
 
+	T& Min() { assert(!Empty()); return v[2]; }
+	T& Max() { assert(!Empty()); return v.size() > 3 ? v[3] : v[2]; }
+	size_t Size() { return v.size() - 2; }
+	bool Empty() { return v.size() <= 2; }
+    void Clear() { v.clear(); v.push_back(T{}), v.push_back(T{}); }
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+private:
+	vector<T> v;
+};
 
-    int t;
-    cin >> t;
+int main() {
+    struct stat st; fstat(0, &st);
+	char *p = (char*)mmap(0, st.st_size, PROT_READ, MAP_SHARED, 0, 0);
+	auto ReadInt = [&]() {
+		int ret = 0; char c = *p++, flag = 0;
+        if (c == '-') c = *p++, flag = 1;
+        for (; c & 16; ret = 10 * ret + (c & 15), c = *p++);
+        return flag ? -ret : ret;
+	};
 
-    while(t--){
-        int k;
-        cin >> k;
-        vector<long long> min_heap = {0, };
-        vector<long long> max_heap = {0, };
-        map<long long, int> m;
-        while(k--){
-            char ID;
-            int val;
-            cin >> ID >> val;
-
-            if(ID == 'I'){
-                min_heap.push_back(val);
-                max_heap.push_back(val);
-                m[val]++;
-                min_heapify("up", min_heap, min_heap.size() - 1);
-                max_heapify("up", max_heap, max_heap.size() - 1);
-            }
-            else{
-                if(val == 1){
-                    while(max_heap.size() > 1 && m[max_heap[1]] == 0){
-                        max_heap[1] = max_heap[max_heap.size() - 1];
-                        max_heap.pop_back();
-                        max_heapify("down", max_heap, 1);
-                    }
-                    if(max_heap.size() > 1){
-                        m[max_heap[1]]--;
-                        max_heap[1] = max_heap[max_heap.size() - 1];
-                        max_heap.pop_back();
-                        max_heapify("down", max_heap, 1);
-                    }
-                }
-                else if(val == -1){
-                    while(min_heap.size() > 1 && m[min_heap[1]] == 0){
-                        min_heap[1] = min_heap[min_heap.size() - 1];
-                        min_heap.pop_back();
-                        min_heapify("down", min_heap, 1);
-                    }
-                    if(min_heap.size() > 1){
-                        m[min_heap[1]]--;
-                        min_heap[1] = min_heap[min_heap.size() - 1];
-                        min_heap.pop_back();
-                        min_heapify("down", min_heap, 1);
-                    }
-                }
-            }
-        }
-        
-        while(max_heap.size() > 1 && m[max_heap[1]] == 0){
-            max_heap[1] = max_heap[max_heap.size() - 1];
-            max_heap.pop_back();
-            max_heapify("down", max_heap, 1);
-        }
-        while(min_heap.size() > 1 && m[min_heap[1]] == 0){
-            min_heap[1] = min_heap[min_heap.size() - 1];
-            min_heap.pop_back();
-            min_heapify("down", min_heap, 1);
-        }
-        if(min_heap.size() <= 1 || max_heap.size() <= 1) cout << "EMPTY\n";
-        else cout << max_heap[1] << " " << min_heap[1] << "\n";
-    }
-    return 0;
+	int N = ReadInt(); MinMaxHeap<int> PQ;
+	while (N--) {
+		int q = ReadInt(); PQ.Clear();
+		while (q--) {
+			char c = *p++; p++; int t = ReadInt();
+			if (c == 'I') PQ.Push(t);
+			else if (PQ.Size()) {
+				if (t == -1) PQ.PopMin();
+				else PQ.PopMax();
+			}
+		}
+		if (PQ.Empty()) cout << "EMPTY" << '\n';
+		else cout << PQ.Max() << ' ' << PQ.Min() << '\n';
+	}
 }
