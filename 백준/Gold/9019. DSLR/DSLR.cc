@@ -1,66 +1,49 @@
 #include <iostream>
 #include <queue>
-
+#include <algorithm>
 using namespace std;
-
-void D(int cv, string numbers[], queue<int> &Q){
-    int nv = cv * 2;
-    if(nv >= 10000) nv %= 10000;
-    if(numbers[nv] == "") {
-        numbers[nv] = numbers[cv] + "D";
-        Q.push(nv);
-    }
-
-}
-void S(int cv, string numbers[], queue<int> &Q){
-    int nv;
-    if(cv <= 0) nv = 9999;
-    else nv = cv - 1;
-    
-    if(numbers[nv] == "") {
-        numbers[nv] = numbers[cv] + "S";
-        Q.push(nv);
-    }
-}
-void L(int cv, string numbers[], queue<int> &Q){
-    int nv = ((cv * 10) + (cv / 1000)) % 10000;
-    if(numbers[nv] == "") {
-        numbers[nv] = numbers[cv] + "L";
-        Q.push(nv);
-    }
-}
-void R(int cv, string numbers[], queue<int> &Q){
-    int nv = (cv / 10) + ((cv % 10) * 1000);
-    if(numbers[nv] == "") {
-        numbers[nv] = numbers[cv] + "R";
-        Q.push(nv);
-    }
-}
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    cout.tie(nullptr);
-
-    int n;
-    cin >> n;
-    while(n--){
-        int start, end;
-        cin >> start >> end;
-
-        string numbers[10001] = {"", };
-        numbers[start] = "start";
+    
+    int T; cin >> T;
+    while(T--){
+        int A, B; cin >> A >> B;
+        bool visited[10000] = {false,};
+        int from[10000];
+        char how[10000];
         queue<int> Q;
-        Q.push(start);
+
+        Q.push(A);
+        visited[A] = true;
+
         while(!Q.empty()){
-            int cv = Q.front();
-            Q.pop();
-            D(cv, numbers, Q);
-            S(cv, numbers, Q);
-            L(cv, numbers, Q);
-            R(cv, numbers, Q);
-            if(numbers[end] != "") break;
+            int cur = Q.front(); Q.pop();
+            if(cur == B) break;
+
+            int D = (cur * 2) % 10000;
+            int S = (cur == 0) ? 9999 : cur - 1;
+            int L = (cur % 1000) * 10 + cur / 1000;
+            int R = (cur % 10) * 1000 + cur / 10;
+
+            int nxt[4] = {D, S, L, R};
+            char op[4] = {'D', 'S', 'L', 'R'};
+
+            for(int i=0;i<4;i++){
+                if(!visited[nxt[i]]){
+                    visited[nxt[i]] = true;
+                    from[nxt[i]] = cur;
+                    how[nxt[i]] = op[i];
+                    Q.push(nxt[i]);
+                }
+            }
         }
-        cout << numbers[end].substr(5) << "\n";
+
+        string res;
+        for(int cur = B; cur != A; cur = from[cur]) 
+            res += how[cur];
+        reverse(res.begin(), res.end());
+        cout << res << "\n";
     }
 }
