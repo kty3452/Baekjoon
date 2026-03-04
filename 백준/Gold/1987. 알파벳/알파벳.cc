@@ -2,20 +2,25 @@
 using namespace std;
 
 vector<vector<char>> board;
-vector<int> dist;
-vector<pair<int, int>> mv = {pair{1, 0}, pair{-1, 0}, pair{0, 1}, pair{0, -1}};
-int max_num = 1;
+vector<pair<int,int>> mv = {{1,0},{-1,0},{0,1},{0,-1}};
+int R,C;
+int ans = 0;
 
-void dfs(vector<int>& dist, int r, int c){
-    for(auto [dr, dc] : mv){
+void dfs(int r,int c,int mask,int depth){
+    ans = max(ans, depth);
+
+    for(auto [dr,dc] : mv){
         int nr = r + dr;
         int nc = c + dc;
-        if(board[nr][nc] != 'a' && !dist[board[nr][nc] - 'A']){
-            dist[board[nr][nc] - 'A'] = dist[board[r][c] - 'A'] + 1;
-            dfs(dist, nr, nc);
-            max_num = max(dist[board[nr][nc] - 'A'], max_num);
-            dist[board[nr][nc] - 'A'] = 0;
-        }
+
+        char ch = board[nr][nc];
+        if(ch=='a') continue;
+
+        int idx = ch - 'A';
+
+        if(mask & (1<<idx)) continue;
+
+        dfs(nr,nc,mask | (1<<idx), depth+1);
     }
 }
 
@@ -23,26 +28,20 @@ int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int r, c;
-    cin >> r >> c;
+    cin>>R>>C;
 
-    board.resize(r + 2, vector<char>(c + 2, 'a'));
-    dist.resize(26);
+    board.resize(R+2, vector<char>(C+2,'a'));
 
-    for(int i = 1;i <= r;i++){
+    for(int i=1;i<=R;i++){
         string s;
-        cin >> s;
-        for(int j = 1;j <= s.size();j++){
-            board[i][j] = s[j - 1];
-        }
+        cin>>s;
+        for(int j=1;j<=C;j++)
+            board[i][j]=s[j-1];
     }
 
-    dist[board[1][1] - 'A'] = 1;
-    
-    dfs(dist, 1, 1);
+    int start = 1<<(board[1][1]-'A');
 
-    cout << max_num;
+    dfs(1,1,start,1);
 
-    return 0;
+    cout<<ans;
 }
-
