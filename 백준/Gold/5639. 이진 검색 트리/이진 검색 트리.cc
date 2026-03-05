@@ -1,53 +1,30 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-typedef struct Tree{
-    struct Tree* left = NULL;
-    int data;
-    struct Tree* right = NULL;
-} Tree;
+vector<int> pre;
 
-void make_tree(struct Tree* next, int x){
-    if(x < next->data){
-        if(next->left == NULL){
-            struct Tree* leaf = new Tree;
-            leaf->data = x;
-            next->left = leaf;
-        }
-        else make_tree(next->left, x);
-    }
-    else{
-        if(next->right == NULL){
-            struct Tree* leaf = new Tree;
-            leaf->data = x;
-            next->right = leaf;
-        }
-        else make_tree(next->right, x);
-    }
-}
+void solve(int l, int r){
+    if(l > r) return;
 
-void search(struct Tree* next){
-    if(next == NULL) return;
+    int root = pre[l];
+    int mid = l + 1;
 
-    search(next->left);
-    search(next->right);
-    cout << next->data << "\n";
+    while(mid <= r && pre[mid] < root)
+        mid++;
+
+    solve(l+1, mid-1);
+    solve(mid, r);
+
+    cout << root << "\n";
 }
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    struct Tree* root = new Tree;
-    cin >> root->data;
-
-
     int x;
-    while(cin >> x){
-        make_tree(root, x);
-    }
+    while(cin >> x)
+        pre.push_back(x);
 
-    search(root);
-
-    return 0;
+    solve(0, pre.size()-1);
 }
